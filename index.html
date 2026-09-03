@@ -730,11 +730,35 @@
             flex-direction: column;
             gap: 0.7rem;
             transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+            cursor: pointer;
+            position: relative;
         }
         .evento-card:hover {
             transform: translateY(-6px);
             border-color: var(--red);
             box-shadow: 0 18px 40px rgba(0,0,0,0.35);
+        }
+        .evento-card::after {
+            content: "Clicca per ingrandire";
+            position: absolute;
+            top: 1.6rem;
+            right: 1.6rem;
+            background: rgba(193,18,31,0.92);
+            color: var(--cream);
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            padding: 0.35rem 0.6rem;
+            border-radius: 3px;
+            pointer-events: none;
+            opacity: 0;
+            transform: translateY(-4px);
+            transition: opacity 0.25s, transform 0.25s;
+        }
+        .evento-card:hover::after {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         .evento-img {
@@ -779,9 +803,148 @@
             .eventi-grid { grid-template-columns: 1fr; max-width: 420px; }
             .evento-card { padding: 1.2rem 1.1rem 1.6rem; }
             .evento-img { aspect-ratio: 4 / 5; }
+            .evento-card::after {
+                font-size: 0.65rem;
+                top: 1.2rem;
+                right: 1.2rem;
+                padding: 0.25rem 0.5rem;
+            }
         }
 
+        /* ── Lightbox locandine eventi: elegante + navigazione ── */
+        .lightbox {
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: clamp(1rem, 3vw, 2.5rem);
+            background: rgba(10, 3, 3, 0.72);
+            backdrop-filter: blur(18px) saturate(0.8);
+            -webkit-backdrop-filter: blur(18px) saturate(0.8);
+            visibility: hidden;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s ease, visibility 0.35s ease;
+        }
 
+        .lightbox.active {
+            visibility: visible;
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .lightbox-img {
+            display: block;
+            max-width: min(88vw, 980px);
+            max-height: 84vh;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            border-radius: 10px;
+            box-shadow: 0 30px 90px rgba(0,0,0,0.62);
+            transform: translateY(18px) scale(0.92);
+            opacity: 0;
+            transition: transform 0.42s cubic-bezier(.2,.8,.2,1),
+                        opacity 0.3s ease;
+            user-select: none;
+        }
+
+        .lightbox.active .lightbox-img {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
+
+        .lightbox-close,
+        .lightbox-nav {
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255,255,255,0.18);
+            background: rgba(20, 8, 8, 0.55);
+            color: var(--cream);
+            cursor: pointer;
+            z-index: 10001;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: background 0.2s ease, transform 0.2s ease,
+                        border-color 0.2s ease, opacity 0.2s ease;
+        }
+
+        .lightbox-close {
+            top: 1.25rem;
+            right: 1.5rem;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            font-size: 2rem;
+            line-height: 1;
+        }
+
+        .lightbox-nav {
+            top: 50%;
+            width: 52px;
+            height: 52px;
+            margin-top: -26px;
+            border-radius: 50%;
+            font-size: 2rem;
+            line-height: 1;
+        }
+
+        .lightbox-prev { left: clamp(0.75rem, 3vw, 2.5rem); }
+        .lightbox-next { right: clamp(0.75rem, 3vw, 2.5rem); }
+
+        .lightbox-close:hover,
+        .lightbox-nav:hover {
+            background: rgba(193,18,31,0.88);
+            border-color: rgba(255,255,255,0.32);
+            transform: scale(1.08);
+        }
+
+        .lightbox-caption {
+            position: absolute;
+            left: 50%;
+            bottom: 1.25rem;
+            transform: translateX(-50%);
+            width: min(90vw, 800px);
+            text-align: center;
+            color: var(--cream);
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1rem, 2vw, 1.25rem);
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            text-shadow: 0 2px 14px rgba(0,0,0,0.7);
+            opacity: 0;
+            transition: opacity 0.35s ease 0.12s;
+            pointer-events: none;
+        }
+
+        .lightbox.active .lightbox-caption { opacity: 0.95; }
+
+        .lightbox-counter {
+            position: absolute;
+            top: 1.45rem;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(245,239,230,0.82);
+            font-size: 0.78rem;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            pointer-events: none;
+        }
+
+        @media (max-width: 560px) {
+            .lightbox { padding: 1rem; }
+            .lightbox-img { max-width: 88vw; max-height: 78vh; border-radius: 7px; }
+            .lightbox-close { top: 0.75rem; right: 0.75rem; width: 42px; height: 42px; font-size: 1.7rem; }
+            .lightbox-nav { width: 44px; height: 44px; margin-top: -22px; font-size: 1.65rem; }
+            .lightbox-prev { left: 0.55rem; }
+            .lightbox-next { right: 0.55rem; }
+            .lightbox-caption { bottom: 0.7rem; font-size: 0.95rem; }
+            .lightbox-counter { top: 1rem; font-size: 0.68rem; }
+        }
 
         /* ── Footer multi-colonna ── */
         footer {
@@ -946,8 +1109,7 @@
         <section class="hero-panel hp-3">
             <div class="hero-inner">
                 <h2>Ingredienti veri, sapore autentico</h2>
-                <p>Pomodoro San Marzano, mozzarella di bufala DOP, farine selezionate e<br>
-                   a lunga lievitazione.</p>
+                <p>Pomodoro San Marzano, mozzarella di bufala DOP, farine selezionate e lievitazione di 48 ore.</p>
                 <a href="#mercoledi" class="btn">Giro Pizza del mercoledì</a>
             </div>
         </section>
@@ -1042,7 +1204,7 @@
                     <div class="pizza-info">
                         <h3>Asparagi e Speck</h3>
                         <p>Pomodoro San Marzano, mozzarella di bufala DOP, speck DOP, asparagi, olio EVO</p>
-                        <span class="price">€ 8,50</span>
+                        <span class="price">€ 8,00</span>
                     </div>
                 </div>
 
@@ -1060,7 +1222,7 @@
                     <div class="pizza-info">
                         <h3>Verdure</h3>
                         <p>Pomodoro, Mozzarella, melanzane, zucchine</p>
-                        <span class="price">€ 8,50</span>
+                        <span class="price">€ 11,00</span>
                     </div>
                 </div>
 
@@ -1083,11 +1245,11 @@
                 </div>
 
                 <div class="pizza-card">
-                    <img src="Immagini/DaMi.jpg" alt="Pizza Da Mi">
+                    <img src="https://images.unsplash.com/photo-1604068549290-dea0e4a305ca?w=600" alt="Pizza Marinara">
                     <div class="pizza-info">
-                        <h3>Da Mi</h3>
-                        <p>Pomodoro, mozzarella fior di latte, peperoni grigliati, olive taggiasche, acciughe, pomodorini rossi confit, cipolla di Tropea, origano a fine cottura</p>
-                        <span class="price">€ 15,00</span>
+                        <h3>Marinara</h3>
+                        <p>Pomodoro San Marzano, aglio, origano, olio extravergine d'oliva</p>
+                        <span class="price">€ 6,50</span>
                     </div>
                 </div>
 
@@ -1105,7 +1267,7 @@
             <div class="qr-inner">
                 <p class="qr-label">Inquadra il QR code con la fotocamera del telefono per aprire il menu completo</p>
                 <div class="qr-box">
-                    <img id="qr-img" src="" alt="QR Code Menu Da Mi" width="220" height="220" >
+                    <img id="qr-img" src="" alt="QR Code Menu Da Mi" width="220" height="220">
                 </div>
                 <a class="btn btn-dark" id="pdf-link" href="Menu/menu.html" target="_blank">
                     Scarica il Menu
@@ -1163,19 +1325,19 @@
         <p class="section-lead">Ogni venerdì del mese da Mì è una serata speciale: musica dal vivo e degustazioni per accompagnare la tua pizza. Ecco gli appuntamenti fissi del mese.</p>
 
         <div class="eventi-grid">
-            <div class="evento-card">
-                <img class="evento-img" src="Locandine/6703d5b7-47c5-4781-b11f-26edb7b0c590.JPG" alt="Locandina Pizza e Vino" loading="lazy">
+            <div class="evento-card" role="button" tabindex="0" aria-label="Apri la locandina di Serata Celtica" title="Clicca per aprire la locandina">
+                <img class="evento-img" src="Locandine/dae285f3-a21a-4353-b4c6-22ce1256f61f.JPG" alt="Locandina Serata Celtica" loading="lazy">
                 <span class="evento-date">Venerdì 4 Settembre</span>
-                <h3 class="evento-title">Le Emozioni in Musica</h3>
-                <p class="evento-desc">Una serata dedicata alle grandi canzoni di sempre. Un viaggio tra emozioni, ricordi e melodie indimenticabili</p>
-                <span class="evento-time">Dalle 21:00</span>
-            </div>
-            <div class="evento-card">
-                <img class="evento-img" src="Locandine/dae285f3-a21a-4353-b4c6-22ce1256f61f.JPG" alt="Locandina Pizza e Vino" loading="lazy">
-                <span class="evento-date">Venerdi 5 Settembre</span>
                 <h3 class="evento-title">Serata Celtica</h3>
                 <p class="evento-desc">Una serata immersa nelle magiche atmosfere celtiche per vivere insieme musica, convivialità e leggende della tradizione celtica.</p>
-                <span class="evento-time">Dalle 21:00</span>
+                <span class="evento-time">Dalle 20:30</span>
+            </div>
+            <div class="evento-card" role="button" tabindex="0" aria-label="Apri la locandina di Le Emozioni in Musica" title="Clicca per aprire la locandina">
+                <img class="evento-img" src="Locandine/6703d5b7-47c5-4781-b11f-26edb7b0c590.JPG" alt="Locandina Le Emozioni in Musica" loading="lazy">
+                <span class="evento-date">Venerdi 11 Settembre</span>
+                <h3 class="evento-title">Le Emozioni in Musica</h3>
+                <p class="evento-desc">Una serata dedicata alle grandi canzoni di sempre. Un viaggio tra emozioni, ricordi e melodie indimenticabili</p>
+                <span class="evento-time">Dalle 20:00</span>
             </div>
         </div>
 
@@ -1196,8 +1358,8 @@
             <div class="info-grid">
                 <div class="info-card">
                     <h3>Orari di apertura</h3>
-                    <p><strong>Gio – Dom:</strong> 17:30 – 23:00</p>
-                    <p><strong>Lun – Mer:</strong> Chiuso</p>
+                    <p><strong>Mer – Dom:</strong> 17:30 – 23:00</p>
+                    <p><strong>Lun – Mar:</strong> Chiuso</p>
                 </div>
                 <div class="info-card">
                     <h3>Dove siamo</h3>
@@ -1246,8 +1408,8 @@
             <div class="footer-col">
                 <h4>Orari</h4>
                 <ul>
-                    <li>Gio – Dom: 17:30 – 23:00</li>
-                    <li>Lun – Mer: Chiuso</li>
+                    <li>Mer – Dom: 17:30 – 23:00</li>
+                    <li>Lun – Mar: Chiuso</li>
                 </ul>
             </div>
         </div>
@@ -1256,6 +1418,15 @@
             © 2026 Pizzeria Da Mì — Tutti i diritti riservati · Fatta con cura e farina 00
         </div>
     </footer>
+
+    <div id="lightbox" class="lightbox" aria-hidden="true">
+        <button class="lightbox-close" aria-label="Chiudi locandina">&times;</button>
+        <div class="lightbox-counter" id="lightbox-counter" aria-live="polite"></div>
+        <button class="lightbox-nav lightbox-prev" aria-label="Locandina precedente">&#10094;</button>
+        <img id="lightbox-img" class="lightbox-img" src="" alt="Locandina ingrandita">
+        <button class="lightbox-nav lightbox-next" aria-label="Locandina successiva">&#10095;</button>
+        <div id="lightbox-caption" class="lightbox-caption"></div>
+    </div>
 
     <script>
     (function () {
@@ -1283,9 +1454,124 @@
         }
 
         var absUrl = window.location.origin + window.location.pathname.replace(/[^/]*$/, '') + PDF_URL;
-        qrImg.src = buildQR(absUrl);
-        pdfLink.href = PDF_URL;
-        qrNote.textContent = absUrl;
+        if (qrImg) qrImg.src = buildQR(absUrl);
+        if (pdfLink) pdfLink.href = PDF_URL;
+        if (qrNote) qrNote.textContent = absUrl;
+
+        // ── Lightbox locandine eventi ──
+        var lightbox = document.getElementById('lightbox');
+        var lightboxImg = document.getElementById('lightbox-img');
+        var lightboxCaption = document.getElementById('lightbox-caption');
+        var lightboxCounter = document.getElementById('lightbox-counter');
+        var lightboxClose = document.querySelector('.lightbox-close');
+        var lightboxPrev = document.querySelector('.lightbox-prev');
+        var lightboxNext = document.querySelector('.lightbox-next');
+        var eventoCards = document.querySelectorAll('#eventi .evento-card');
+        var currentEventoIndex = 0;
+
+        function showEvento(index) {
+            if (!lightbox || !lightboxImg || !eventoCards.length) return;
+
+            currentEventoIndex = (index + eventoCards.length) % eventoCards.length;
+            var card = eventoCards[currentEventoIndex];
+            var img = card.querySelector('.evento-img');
+            var title = card.querySelector('.evento-title');
+
+            if (!img) return;
+
+            // Piccolo reset per ottenere una nuova animazione ad ogni cambio.
+            lightboxImg.style.opacity = '0';
+            lightboxImg.style.transform = 'translateY(10px) scale(0.96)';
+
+            window.setTimeout(function () {
+                lightboxImg.src = img.getAttribute('src');
+                lightboxImg.alt = img.alt || 'Locandina ingrandita';
+                lightboxCaption.textContent = title ? title.textContent : '';
+                lightboxCounter.textContent =
+                    (currentEventoIndex + 1) + ' / ' + eventoCards.length;
+
+                requestAnimationFrame(function () {
+                    lightboxImg.style.opacity = '';
+                    lightboxImg.style.transform = '';
+                });
+            }, 80);
+        }
+
+        function openLightbox(index) {
+            if (!lightbox) return;
+            lightbox.setAttribute('aria-hidden', 'false');
+            lightbox.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            showEvento(index);
+            if (lightboxClose) lightboxClose.focus();
+        }
+
+        function closeLightbox() {
+            if (!lightbox) return;
+            lightbox.classList.remove('active');
+            lightbox.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+            window.setTimeout(function () {
+                if (!lightbox.classList.contains('active')) {
+                    lightboxImg.src = '';
+                }
+            }, 350);
+        }
+
+        function nextEvento() { showEvento(currentEventoIndex + 1); }
+        function prevEvento() { showEvento(currentEventoIndex - 1); }
+
+        eventoCards.forEach(function (card, index) {
+            card.addEventListener('click', function () {
+                openLightbox(index);
+            });
+            card.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    openLightbox(index);
+                }
+            });
+        });
+
+        if (lightboxPrev) {
+            lightboxPrev.addEventListener('click', function (e) {
+                e.stopPropagation();
+                prevEvento();
+            });
+        }
+
+        if (lightboxNext) {
+            lightboxNext.addEventListener('click', function (e) {
+                e.stopPropagation();
+                nextEvento();
+            });
+        }
+
+        if (lightbox) {
+            lightbox.addEventListener('click', function (e) {
+                if (e.target === lightbox) closeLightbox();
+            });
+        }
+
+        if (lightboxClose) {
+            lightboxClose.addEventListener('click', function (e) {
+                e.stopPropagation();
+                closeLightbox();
+            });
+        }
+
+        document.addEventListener('keydown', function (e) {
+            if (!lightbox || !lightbox.classList.contains('active')) return;
+
+            if (e.key === 'Escape') {
+                closeLightbox();
+            } else if (e.key === 'ArrowRight') {
+                nextEvento();
+            } else if (e.key === 'ArrowLeft') {
+                prevEvento();
+            }
+        });
+
     })();
     </script>
 
